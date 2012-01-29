@@ -16,7 +16,7 @@ public class DesktopnotificationsApplication extends Application {
     getMainWindow().addComponent(c);
 
     getMainWindow().addComponent(
-        new Button("request permission", new Button.ClickListener() {
+        new Button("Make notifications awesome", new Button.ClickListener() {
           public void buttonClick(final ClickEvent event) {
             c.requestPermission();
           }

@@ -54,6 +54,7 @@ public class VDesktopNotifier extends Widget implements Paintable {
 
   public static final String CLASSNAME = "v-desktopnotifier";
 
+  public static final String VAR_ALLOWED_BOOL = "a";
   public static final String VAR_BROWSER_SUPPORT_BOOL = "s";
   public static final String ATT_ICON_ARRAY_STR = "i";
   public static final String ATT_HEADING_ARRAY_STR = "h";
@@ -61,6 +62,10 @@ public class VDesktopNotifier extends Widget implements Paintable {
   public static final String ATT_REQUEST_PERMISSION = "p";
   public static final String ATT_TEXT_STRING = "t";
   public static final String ATT_HTML_NOTIFICAITONS_STRARR = "ph";
+
+  private static final int NOTIFICATIONS_ALLOWED = 0;
+  private static final int NOTIFICATIONS_NOT_YET_ANSWERED = 1;
+  private static final int NOTIFICATIONS_DISALLOWED = 2;
 
   protected String paintableId;
   ApplicationConnection client;
@@ -133,7 +138,20 @@ public class VDesktopNotifier extends Widget implements Paintable {
 
     if (!supportHasBeenChecked) {
       client.updateVariable(paintableId, VAR_BROWSER_SUPPORT_BOOL,
-          notificationsAreSupported(), true);
+          notificationsAreSupported(), false);
+
+      if (notificationsAreAllowed()) {
+        client.updateVariable(paintableId, VAR_ALLOWED_BOOL, true, false);
+      } else if (notificationsAreDisallowed()) {
+        client.updateVariable(paintableId, VAR_ALLOWED_BOOL, false, false);
+      } else {
+        /*
+         * since the notification allowing/disallowing isn't answered to yet,
+         * don't send anything to the server.
+         */
+      }
+
+      client.sendPendingVariableChanges();
       supportHasBeenChecked = true;
     }
   }
@@ -149,10 +167,18 @@ public class VDesktopNotifier extends Widget implements Paintable {
    $wnd.webkitNotifications.createHTMLNotification(url).show();
   }-*/;
 
-  private static native boolean notificationsAreAllowed()
+  private static native int checkPermission()
   /*-{
-   return $wnd.webkitNotifications.checkPermission() == 0;
+   return $wnd.webkitNotifications.checkPermission();
   }-*/;
+
+  private static boolean notificationsAreAllowed() {
+    return checkPermission() == NOTIFICATIONS_ALLOWED;
+  }
+
+  private static boolean notificationsAreDisallowed() {
+    return checkPermission() == NOTIFICATIONS_DISALLOWED;
+  }
 
   private static boolean containsNotifications(final UIDL uidl) {
     return uidl.hasAttribute(ATT_BODY_ARRAY_STR);
