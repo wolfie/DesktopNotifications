@@ -4,7 +4,6 @@ import com.vaadin.Application;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Window;
 
 public class DesktopnotificationsApplication extends Application {
@@ -15,10 +14,6 @@ public class DesktopnotificationsApplication extends Application {
 
     final DesktopNotifier c = new DesktopNotifier();
     getMainWindow().addComponent(c);
-
-    final NativeButton nb = new NativeButton("yo");
-    nb.setHeight("2000px");
-    getMainWindow().addComponent(nb);
 
     getMainWindow().addComponent(
         new Button("request permission", new Button.ClickListener() {

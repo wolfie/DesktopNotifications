@@ -3,8 +3,11 @@ package com.github.wolfie.desktopnotifications.widgetset.client.ui;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
@@ -15,24 +18,31 @@ import com.vaadin.terminal.gwt.client.ui.VOverlay;
 
 public class VDesktopNotifier extends Widget implements Paintable {
 
-  private static class VPermissionButton extends VOverlay {
-    public VPermissionButton(final String text) {
+  private static class VPermissionPopup extends VOverlay {
+    public VPermissionPopup(final String text) {
       setModal(true);
-      setWidth("300px");
+      setWidth("400px");
+      setStyleName("v-permissionpopup");
 
       final VerticalPanel panel = new VerticalPanel();
 
-      panel.add(new HTML(text));
+      final HTML html = new HTML(text);
+      html.setStyleName(null);
+      panel.add(html);
 
-      final Anchor anchor = new Anchor("ok");
-      anchor.addClickHandler(new ClickHandler() {
+      final Button button = new Button("OK");
+      button.setStyleName("okbutton");
+      button.addClickHandler(new ClickHandler() {
         public void onClick(final ClickEvent event) {
           requestPermission();
           hide();
         }
       });
 
-      panel.add(anchor);
+      panel.add(button);
+      panel.setCellHorizontalAlignment(button,
+          HasHorizontalAlignment.ALIGN_CENTER);
+      panel.setCellVerticalAlignment(button, HasVerticalAlignment.ALIGN_MIDDLE);
       add(panel);
     }
 
@@ -158,9 +168,10 @@ public class VDesktopNotifier extends Widget implements Paintable {
 
   private static void trickUserIntoFiringAUserEvent(final String text) {
     if (notificationsAreSupported() && !notificationsAreAllowed()) {
-      final VPermissionButton button = new VPermissionButton(text);
-      button.show();
-      button.center();
+      final VPermissionPopup popup = new VPermissionPopup(text);
+      popup.show();
+      popup.center();
+      popup.setPopupPosition(popup.getPopupLeft(), Window.getScrollTop() + 50);
     }
   }
 }
