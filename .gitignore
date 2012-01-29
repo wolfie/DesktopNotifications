@@ -1,0 +1,6 @@
+.classpath
+.project
+.settings/
+GWT development mode for DesktopNotifications.launch
+build/
+WebContent/VAADIN/widgetsets/
