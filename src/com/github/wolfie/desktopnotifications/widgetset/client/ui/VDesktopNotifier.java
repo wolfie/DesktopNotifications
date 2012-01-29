@@ -61,7 +61,8 @@ public class VDesktopNotifier extends Widget implements Paintable {
   public static final String ATT_BODY_ARRAY_STR = "b";
   public static final String ATT_REQUEST_PERMISSION = "p";
   public static final String ATT_TEXT_STRING = "t";
-  public static final String ATT_HTML_NOTIFICAITONS_STRARR = "ph";
+  public static final String ATT_HTML_NOTIFICATIONS_STRARR = "ph";
+  public static final String ATT_HTML_NOTIFICATIONS_RESOURCE_STRARR = "phr";
 
   private static final int NOTIFICATIONS_ALLOWED = 0;
   private static final int NOTIFICATIONS_NOT_YET_ANSWERED = 1;
@@ -122,16 +123,30 @@ public class VDesktopNotifier extends Widget implements Paintable {
       }
     }
 
-    if (uidl.hasAttribute(ATT_HTML_NOTIFICAITONS_STRARR)) {
+    if (uidl.hasAttribute(ATT_HTML_NOTIFICATIONS_STRARR)) {
       if (!notificationsAreSupported()) {
         VConsole.log("Tried to send unsupported desktop notifications");
       } else if (!notificationsAreAllowed()) {
         VConsole.log("Notifications aren't allowed");
       } else {
         final String[] htmlUrls = uidl
-            .getStringArrayAttribute(ATT_HTML_NOTIFICAITONS_STRARR);
+            .getStringArrayAttribute(ATT_HTML_NOTIFICATIONS_STRARR);
         for (final String htmlUrl : htmlUrls) {
           showHtmlNotification(htmlUrl);
+        }
+      }
+    }
+
+    if (uidl.hasAttribute(ATT_HTML_NOTIFICATIONS_RESOURCE_STRARR)) {
+      if (!notificationsAreSupported()) {
+        VConsole.log("Tried to send unsupported desktop notifications");
+      } else if (!notificationsAreAllowed()) {
+        VConsole.log("Notifications aren't allowed");
+      } else {
+        final String[] htmlResources = uidl
+            .getStringArrayAttribute(ATT_HTML_NOTIFICATIONS_RESOURCE_STRARR);
+        for (final String htmlUrl : htmlResources) {
+          showHtmlNotification(getSrc(htmlUrl, client));
         }
       }
     }
@@ -156,6 +171,22 @@ public class VDesktopNotifier extends Widget implements Paintable {
     }
   }
 
+  /**
+   * Helper to return translated src-attribute from embedded's UIDL
+   * 
+   * @param uidl
+   * @param client
+   * @return
+   */
+  private static String getSrc(final String string,
+      final ApplicationConnection client) {
+    final String url = client.translateVaadinUri(string);
+    if (url == null) {
+      return "";
+    }
+    return url;
+  }
+
   private static native boolean showNotification(String icon, String heading,
       String body)
   /*-{
@@ -164,6 +195,7 @@ public class VDesktopNotifier extends Widget implements Paintable {
 
   private static native boolean showHtmlNotification(String url)
   /*-{
+   console.log("Html notification: "+url);
    $wnd.webkitNotifications.createHTMLNotification(url).show();
   }-*/;
 

@@ -1,0 +1,26 @@
+<html>
+<body id="body" style="font-size: 12px; font-family: Arial, Helvetica, Verdana, Tahoma, sans-serif;">
+<h1>Hello there</h1>
+<p>
+I'm <b>awesome</b>.
+</p>
+
+<script type="text/javascript">
+var color=0;
+
+function cycleColors() {
+	var inverse = (255-color);
+	var bodyStyle=document.getElementById("body").style;
+	bodyStyle.backgroundColor="rgb("+inverse+","+inverse+","+inverse+")";
+	bodyStyle.color="rgb("+color+","+color+","+color+")";
+	color+=2;
+	if (color>255) color=0;
+	setTimeout("cycleColors()",20);
+}
+
+setTimeout("cycleColors()",20);
+
+setTimeout("window.close();", 5000);
+</script>
+</body>
+</html>

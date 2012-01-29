@@ -7,8 +7,14 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.wolfie.desktopnotifications.widgetset.client.ui.VDesktopNotifier;
+import com.vaadin.Application;
+import com.vaadin.terminal.ApplicationResource;
+import com.vaadin.terminal.ExternalResource;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
+import com.vaadin.terminal.Resource;
+import com.vaadin.terminal.ThemeResource;
+import com.vaadin.terminal.gwt.server.JsonPaintTarget;
 import com.vaadin.ui.AbstractComponent;
 
 /**
@@ -47,6 +53,7 @@ public class DesktopNotifier extends AbstractComponent {
   private Boolean isDisallowed;
 
   private final List<Notification> pendingNotifications = new ArrayList<Notification>();
+  private final List<Resource> pendingHtmlNotificationsResources = new ArrayList<Resource>();
   private boolean pendingPermissionRequest;
 
   private String text = null;
@@ -90,9 +97,24 @@ public class DesktopNotifier extends AbstractComponent {
     if (!pendingHtmlNotifications.isEmpty()) {
       final String[] htmlUrlsArray = pendingHtmlNotifications
           .toArray(new String[pendingHtmlNotifications.size()]);
-      target.addAttribute(VDesktopNotifier.ATT_HTML_NOTIFICAITONS_STRARR,
+      target.addAttribute(VDesktopNotifier.ATT_HTML_NOTIFICATIONS_STRARR,
           htmlUrlsArray);
       pendingHtmlNotifications.clear();
+    }
+
+    if (!pendingHtmlNotificationsResources.isEmpty()) {
+      final Resource[] htmlResourcesArray = pendingHtmlNotificationsResources
+          .toArray(new Resource[pendingHtmlNotificationsResources.size()]);
+
+      final String[] htmlResourceStringsArray = new String[htmlResourcesArray.length];
+      for (int i = 0; i < htmlResourcesArray.length; i++) {
+        htmlResourceStringsArray[i] = convertResourceToString(htmlResourcesArray[i]);
+      }
+
+      target.addAttribute(VDesktopNotifier.ATT_HTML_NOTIFICATIONS_RESOURCE_STRARR,
+          htmlResourceStringsArray);
+
+      pendingHtmlNotificationsResources.clear();
     }
   }
 
@@ -210,6 +232,24 @@ public class DesktopNotifier extends AbstractComponent {
   }
 
   /**
+   * Show a HTML notification
+   * <p/>
+   * <strong>Note:</strong> This method does nothing if
+   * 
+   * <ul>
+   * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code> OR
+   * <li>{@link #notificationsAreDisallowedByUser()} is <code>true</code> OR
+   * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code>
+   * </ul>
+   * 
+   * @param resource
+   */
+  public void showHtmlNotification(final Resource resource) {
+    pendingHtmlNotificationsResources.add(resource);
+    requestRepaint();
+  }
+
+  /**
    * Prompts the user with a request for permission for showing desktop
    * notifications.
    * 
@@ -231,6 +271,35 @@ public class DesktopNotifier extends AbstractComponent {
     this.text = text;
     pendingTextChange = true;
     requestRepaint();
+  }
+
+  /**
+   * Since there's no support for Resource arrays, we need to hack it. Copied
+   * from {@link JsonPaintTarget#addAttribute(String, Resource)}
+   */
+  private static String convertResourceToString(final Resource resource)
+      throws PaintException {
+    if (resource instanceof ExternalResource) {
+      return ((ExternalResource) resource).getURL();
+
+    } else if (resource instanceof ApplicationResource) {
+      final ApplicationResource r = (ApplicationResource) resource;
+      final Application a = r.getApplication();
+      if (a == null) {
+        throw new PaintException("Application not specified for resorce "
+            + resource.getClass().getName());
+      }
+      final String uri = a.getRelativeLocation(r);
+      return uri;
+    } else if (resource instanceof ThemeResource) {
+      final String uri = "theme://"
+          + ((ThemeResource) resource).getResourceId();
+      return uri;
+    } else {
+      throw new PaintException("Ajax adapter does not "
+          + "support resources of type: " + resource.getClass().getName());
+    }
+
   }
 
 }
