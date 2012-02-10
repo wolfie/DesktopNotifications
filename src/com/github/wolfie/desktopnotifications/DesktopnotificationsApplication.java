@@ -26,6 +26,7 @@ public class DesktopnotificationsApplication extends Application {
     final CssLayout cssLayout = new CssLayout();
     cssLayout.setWidth("100%");
     getMainWindow().addComponent(cssLayout);
+    addButton(0, cssLayout);
     addButton(2, cssLayout);
     addButton(4, cssLayout);
     addButton(6, cssLayout);
@@ -46,7 +47,9 @@ public class DesktopnotificationsApplication extends Application {
       public void notificationSettingsChanged(
           final Boolean isSupportedByBrowser, final Boolean isAllowed,
           final Boolean isDisallowed) {
-        awesomeButton.setVisible(isSupportedByBrowser == Boolean.TRUE);
+
+        awesomeButton.setVisible(isSupportedByBrowser == Boolean.TRUE
+            || isDisallowed == Boolean.TRUE);
         final boolean isNotYetEnabled = isAllowed != Boolean.TRUE;
         awesomeButton.setEnabled(isNotYetEnabled);
 
