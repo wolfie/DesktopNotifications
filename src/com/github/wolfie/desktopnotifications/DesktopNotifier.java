@@ -233,7 +233,7 @@ public class DesktopNotifier extends AbstractComponent {
    * <strong>Note:</strong> This method does nothing if
    * 
    * <ul>
-   * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code> OR
+   * <li>{@link #notificationsAreSupportedByBrowser()} is <code>false</code> OR
    * <li>{@link #notificationsAreDisallowedByUser()} is <code>true</code> OR
    * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code>
    * </ul>
@@ -254,7 +254,7 @@ public class DesktopNotifier extends AbstractComponent {
    * <strong>Note:</strong> This method does nothing if
    * 
    * <ul>
-   * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code> OR
+   * <li>{@link #notificationsAreSupportedByBrowser()} is <code>false</code> OR
    * <li>{@link #notificationsAreDisallowedByUser()} is <code>true</code> OR
    * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code>
    * </ul>
@@ -282,7 +282,7 @@ public class DesktopNotifier extends AbstractComponent {
    * <strong>Note:</strong> This method does nothing if
    * 
    * <ul>
-   * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code> OR
+   * <li>{@link #notificationsAreSupportedByBrowser()} is <code>false</code> OR
    * <li>{@link #notificationsAreDisallowedByUser()} is <code>true</code> OR
    * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code>
    * </ul>
@@ -300,7 +300,7 @@ public class DesktopNotifier extends AbstractComponent {
    * <strong>Note:</strong> This method does nothing if
    * 
    * <ul>
-   * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code> OR
+   * <li>{@link #notificationsAreSupportedByBrowser()} is <code>false</code> OR
    * <li>{@link #notificationsAreDisallowedByUser()} is <code>true</code> OR
    * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code>
    * </ul>
