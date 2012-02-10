@@ -4,6 +4,7 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -19,7 +20,8 @@ import com.vaadin.terminal.gwt.client.ui.VOverlay;
 public class VDesktopNotifier extends Widget implements Paintable {
 
   private static class VPermissionPopup extends VOverlay {
-    public VPermissionPopup(final String text) {
+    public VPermissionPopup(final String text,
+        final AsyncCallback<Void> requestCallback) {
       setModal(true);
       setWidth("400px");
       setStyleName("v-permissionpopup");
@@ -34,7 +36,7 @@ public class VDesktopNotifier extends Widget implements Paintable {
       button.setStyleName("okbutton");
       button.addClickHandler(new ClickHandler() {
         public void onClick(final ClickEvent event) {
-          requestPermission();
+          requestPermission(VPermissionPopup.this, requestCallback);
           hide();
         }
       });
@@ -46,10 +48,19 @@ public class VDesktopNotifier extends Widget implements Paintable {
       add(panel);
     }
 
-    private static native void requestPermission()
+    private native void requestPermission(VPermissionPopup x,
+        AsyncCallback<Void> callback)
     /*-{
-      $wnd.webkitNotifications.requestPermission();
+      $wnd.webkitNotifications.requestPermission($entry(function() {
+              x.@com.github.wolfie.desktopnotifications.widgetset.client.ui.VDesktopNotifier.VPermissionPopup::callbackRequestPermission(Lcom/google/gwt/user/client/rpc/AsyncCallback;)(callback);
+      }));
     }-*/;
+
+    private void callbackRequestPermission(final AsyncCallback<Void> callback) {
+      if (callback != null) {
+        callback.onSuccess(null);
+      }
+    }
   }
 
   public static final String CLASSNAME = "v-desktopnotifier";
@@ -152,23 +163,27 @@ public class VDesktopNotifier extends Widget implements Paintable {
     }
 
     if (!supportHasBeenChecked) {
-      client.updateVariable(paintableId, VAR_BROWSER_SUPPORT_BOOL,
-          notificationsAreSupported(), false);
-
-      if (notificationsAreAllowed()) {
-        client.updateVariable(paintableId, VAR_ALLOWED_BOOL, true, false);
-      } else if (notificationsAreDisallowed()) {
-        client.updateVariable(paintableId, VAR_ALLOWED_BOOL, false, false);
-      } else {
-        /*
-         * since the notification allowing/disallowing isn't answered to yet,
-         * don't send anything to the server.
-         */
-      }
-
-      client.sendPendingVariableChanges();
-      supportHasBeenChecked = true;
+      checkForSupportAndSendResultsToServer();
     }
+  }
+
+  private void checkForSupportAndSendResultsToServer() {
+    client.updateVariable(paintableId, VAR_BROWSER_SUPPORT_BOOL,
+        notificationsAreSupported(), false);
+
+    if (notificationsAreAllowed()) {
+      client.updateVariable(paintableId, VAR_ALLOWED_BOOL, true, false);
+    } else if (notificationsAreDisallowed()) {
+      client.updateVariable(paintableId, VAR_ALLOWED_BOOL, false, false);
+    } else {
+      /*
+       * since the notification allowing/disallowing isn't answered to yet,
+       * don't send anything to the server.
+       */
+    }
+
+    client.sendPendingVariableChanges();
+    supportHasBeenChecked = true;
   }
 
   /**
@@ -224,9 +239,18 @@ public class VDesktopNotifier extends Widget implements Paintable {
      return false;
   }-*/;
 
-  private static void trickUserIntoFiringAUserEvent(final String text) {
+  private void trickUserIntoFiringAUserEvent(final String text) {
     if (notificationsAreSupported() && !notificationsAreAllowed()) {
-      final VPermissionPopup popup = new VPermissionPopup(text);
+      final VPermissionPopup popup = new VPermissionPopup(text,
+          new AsyncCallback<Void>() {
+            public void onSuccess(final Void result) {
+              checkForSupportAndSendResultsToServer();
+            }
+
+            public void onFailure(final Throwable caught) {
+              // ignore
+            }
+          });
       popup.show();
       popup.center();
       popup.setPopupPosition(popup.getPopupLeft(), Window.getScrollTop() + 50);

@@ -28,7 +28,8 @@ public class DesktopNotifier extends AbstractComponent {
     private final String heading;
     private final String body;
 
-    public Notification(final String icon, final String heading, final String body) {
+    public Notification(final String icon, final String heading,
+        final String body) {
       super();
       this.icon = icon;
       this.heading = heading;
@@ -60,7 +61,6 @@ public class DesktopNotifier extends AbstractComponent {
   private boolean pendingTextChange = false;
 
   private final Set<String> pendingHtmlNotifications = new HashSet<String>();
-  private boolean isAllowedHasBeenChecked;
 
   @Override
   public void paintContent(final PaintTarget target) throws PaintException {
@@ -111,7 +111,8 @@ public class DesktopNotifier extends AbstractComponent {
         htmlResourceStringsArray[i] = convertResourceToString(htmlResourcesArray[i]);
       }
 
-      target.addAttribute(VDesktopNotifier.ATT_HTML_NOTIFICATIONS_RESOURCE_STRARR,
+      target.addAttribute(
+          VDesktopNotifier.ATT_HTML_NOTIFICATIONS_RESOURCE_STRARR,
           htmlResourceStringsArray);
 
       pendingHtmlNotificationsResources.clear();
@@ -153,7 +154,7 @@ public class DesktopNotifier extends AbstractComponent {
   }
 
   /**
-   * Checks whether the user has allowed desktop notifications
+   * Checks whether the user has allowed desktop notifications.
    * 
    * @return <code>true</code> iff the user has given an explicit permission for
    *         the server to send desktop notifications. <code>false</code> is
@@ -165,11 +166,15 @@ public class DesktopNotifier extends AbstractComponent {
    */
   public boolean notificationsAreAllowedByUser()
       throws MethodWasCalledBeforeClientRoundtripException {
-    if (isAllowedHasBeenChecked) {
+    if (browserHasSentSupportInformation()) {
       return (isAllowed != null) ? isAllowed : false;
     } else {
       throw new MethodWasCalledBeforeClientRoundtripException();
     }
+  }
+
+  private boolean browserHasSentSupportInformation() {
+    return isSupportedByBrowser != null;
   }
 
   /**
@@ -185,7 +190,7 @@ public class DesktopNotifier extends AbstractComponent {
    */
   public boolean notificationsAreDisallowedByUser()
       throws MethodWasCalledBeforeClientRoundtripException {
-    if (isAllowedHasBeenChecked) {
+    if (browserHasSentSupportInformation()) {
       return (isDisallowed != null) ? isDisallowed : false;
     } else {
       throw new MethodWasCalledBeforeClientRoundtripException();
