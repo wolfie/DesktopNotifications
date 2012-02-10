@@ -34,12 +34,28 @@ public class DesktopnotificationsApplication extends Application {
 
     getMainWindow().addComponent(c);
 
-    getMainWindow().addComponent(
-        new Button("Make notifications awesome", new Button.ClickListener() {
+    final Button awesomeButton = new Button("Make notifications awesome",
+        new Button.ClickListener() {
           public void buttonClick(final ClickEvent event) {
             c.requestPermission();
           }
-        }));
+        });
+    getMainWindow().addComponent(awesomeButton);
+
+    c.addListener(new DesktopNotifier.SettingsListener() {
+      public void notificationSettingsChanged(
+          final Boolean isSupportedByBrowser, final Boolean isAllowed,
+          final Boolean isDisallowed) {
+        awesomeButton.setVisible(isSupportedByBrowser == Boolean.TRUE);
+        final boolean isNotYetEnabled = isAllowed != Boolean.TRUE;
+        awesomeButton.setEnabled(isNotYetEnabled);
+
+        if (!isNotYetEnabled) {
+          awesomeButton
+              .setCaption("okay, they're considerably more awesome now");
+        }
+      }
+    });
   }
 
   private void addButton(final int i, final Layout layout) {
