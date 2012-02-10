@@ -210,7 +210,6 @@ public class VDesktopNotifier extends Widget implements Paintable {
 
   private static native boolean showHtmlNotification(String url)
   /*-{
-   console.log("Html notification: "+url);
    $wnd.webkitNotifications.createHTMLNotification(url).show();
   }-*/;
 
@@ -220,11 +219,19 @@ public class VDesktopNotifier extends Widget implements Paintable {
   }-*/;
 
   private static boolean notificationsAreAllowed() {
-    return checkPermission() == NOTIFICATIONS_ALLOWED;
+    if (notificationsAreSupported()) {
+      return checkPermission() == NOTIFICATIONS_ALLOWED;
+    } else {
+      return false;
+    }
   }
 
   private static boolean notificationsAreDisallowed() {
-    return checkPermission() == NOTIFICATIONS_DISALLOWED;
+    if (notificationsAreSupported()) {
+      return checkPermission() == NOTIFICATIONS_DISALLOWED;
+    } else {
+      return false;
+    }
   }
 
   private static boolean containsNotifications(final UIDL uidl) {
