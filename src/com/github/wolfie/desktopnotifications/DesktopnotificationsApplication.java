@@ -69,6 +69,7 @@ public class DesktopnotificationsApplication extends Application {
           Thread.sleep(i * 1000);
           if (c.notificationsAreAllowedByUser()) {
             c.showHtmlNotification(new ThemeResource("notification.html"));
+            c.showNotification(new ThemeResource("icon.png"), "Header", "body");
           } else {
             layout.getApplication().getMainWindow()
                 .showNotification("You have mail.");

@@ -123,7 +123,11 @@ public class DesktopNotifier extends AbstractComponent {
 
       final String[] htmlResourceStringsArray = new String[htmlResourcesArray.length];
       for (int i = 0; i < htmlResourcesArray.length; i++) {
-        htmlResourceStringsArray[i] = convertResourceToString(htmlResourcesArray[i]);
+        try {
+          htmlResourceStringsArray[i] = convertResourceToString(htmlResourcesArray[i]);
+        } catch (final ResourceConversionException e) {
+          throw new PaintException(e.getMessage());
+        }
       }
 
       target.addAttribute(
@@ -245,6 +249,34 @@ public class DesktopNotifier extends AbstractComponent {
   }
 
   /**
+   * Show a plaintext notification
+   * <p/>
+   * <strong>Note:</strong> This method does nothing if
+   * 
+   * <ul>
+   * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code> OR
+   * <li>{@link #notificationsAreDisallowedByUser()} is <code>true</code> OR
+   * <li>{@link #notificationsAreAllowedByUser()} is <code>false</code>
+   * </ul>
+   * 
+   * @param iconResource
+   * @param header
+   * @param body
+   */
+  public void showNotification(final Resource iconResource,
+      final String header, final String body) {
+    try {
+      final String iconResourceString = VDesktopNotifier.RESOURCE_STRING_PREFIX
+          + convertResourceToString(iconResource);
+      pendingNotifications.add(new Notification(iconResourceString, header,
+          body));
+      requestRepaint();
+    } catch (final ResourceConversionException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
    * Show a HTML notification
    * <p/>
    * <strong>Note:</strong> This method does nothing if
@@ -309,7 +341,7 @@ public class DesktopNotifier extends AbstractComponent {
    * from {@link JsonPaintTarget#addAttribute(String, Resource)}
    */
   private static String convertResourceToString(final Resource resource)
-      throws PaintException {
+      throws ResourceConversionException {
     if (resource instanceof ExternalResource) {
       return ((ExternalResource) resource).getURL();
 
@@ -317,8 +349,9 @@ public class DesktopNotifier extends AbstractComponent {
       final ApplicationResource r = (ApplicationResource) resource;
       final Application a = r.getApplication();
       if (a == null) {
-        throw new PaintException("Application not specified for resorce "
-            + resource.getClass().getName());
+        throw new ResourceConversionException(
+            "Application not specified for resorce "
+                + resource.getClass().getName());
       }
       final String uri = a.getRelativeLocation(r);
       return uri;
@@ -327,7 +360,7 @@ public class DesktopNotifier extends AbstractComponent {
           + ((ThemeResource) resource).getResourceId();
       return uri;
     } else {
-      throw new PaintException("Ajax adapter does not "
+      throw new ResourceConversionException("Ajax adapter does not "
           + "support resources of type: " + resource.getClass().getName());
     }
   }

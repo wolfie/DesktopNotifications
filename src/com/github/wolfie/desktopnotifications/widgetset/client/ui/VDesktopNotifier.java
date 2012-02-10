@@ -79,6 +79,15 @@ public class VDesktopNotifier extends Widget implements Paintable {
   private static final int NOTIFICATIONS_NOT_YET_ANSWERED = 1;
   private static final int NOTIFICATIONS_DISALLOWED = 2;
 
+  /**
+   * An identifier that differentiates between urls and resoruces in
+   * {@link com.github.wolfie.desktopnotifications.DesktopNotifier#showNotification(com.vaadin.terminal.Resource, String, String)
+   * DesktopNotifier.showNotification(Resource, String, String)} and
+   * {@link com.github.wolfie.desktopnotifications.DesktopNotifier#showNotification(String, String, String)
+   * DesktopNotifier.showNotification(String, String, String)}
+   */
+  public static final String RESOURCE_STRING_PREFIX = "!";
+
   protected String paintableId;
   ApplicationConnection client;
 
@@ -129,7 +138,8 @@ public class VDesktopNotifier extends Widget implements Paintable {
             .getStringArrayAttribute(ATT_BODY_ARRAY_STR);
 
         for (int i = 0; i < icons.length; i++) {
-          showNotification(icons[i], headings[i], bodies[i]);
+          final String icon = convertResourceUrlToRealUrlIfNeeded(icons[i]);
+          showNotification(icon, headings[i], bodies[i]);
         }
       }
     }
@@ -164,6 +174,16 @@ public class VDesktopNotifier extends Widget implements Paintable {
 
     if (!supportHasBeenChecked) {
       checkForSupportAndSendResultsToServer();
+    }
+  }
+
+  private String convertResourceUrlToRealUrlIfNeeded(final String url) {
+    if (url.startsWith(RESOURCE_STRING_PREFIX)) {
+      final String parsedResourceUrl = url.substring(RESOURCE_STRING_PREFIX
+          .length());
+      return getSrc(parsedResourceUrl, client);
+    } else {
+      return url;
     }
   }
 
