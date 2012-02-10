@@ -4,17 +4,34 @@ import com.vaadin.Application;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Window;
 
+@SuppressWarnings("serial")
 public class DesktopnotificationsApplication extends Application {
+
+  private final DesktopNotifier c = new DesktopNotifier();
+
   @Override
   public void init() {
     setTheme("dn");
     setMainWindow(new Window("Demo"));
-    getMainWindow().addComponent(new Label("Foo"));
 
-    final DesktopNotifier c = new DesktopNotifier();
+    final Label label = new Label(
+        "How many seconds before you want to feel special?");
+    getMainWindow().addComponent(label);
+
+    final CssLayout cssLayout = new CssLayout();
+    cssLayout.setWidth("100%");
+    getMainWindow().addComponent(cssLayout);
+    addButton(2, cssLayout);
+    addButton(4, cssLayout);
+    addButton(6, cssLayout);
+    addButton(8, cssLayout);
+    addButton(10, cssLayout);
+
     getMainWindow().addComponent(c);
 
     getMainWindow().addComponent(
@@ -23,14 +40,25 @@ public class DesktopnotificationsApplication extends Application {
             c.requestPermission();
           }
         }));
-    getMainWindow().addComponent(
-        new Button("show notificaiton", new Button.ClickListener() {
-          public void buttonClick(final ClickEvent event) {
-            c.showNotification("", "Awesome Notification", "This is a "
-                + "notification your notifications wish they were.");
-            c.showHtmlNotification(new ThemeResource("notification.html"));
-          }
-        }));
   }
 
+  private void addButton(final int i, final Layout layout) {
+    final Button button = new Button(Integer.toString(i));
+    button.addListener(new Button.ClickListener() {
+      public void buttonClick(final ClickEvent event) {
+        try {
+          Thread.sleep(i * 1000);
+          if (c.notificationsAreAllowedByUser()) {
+            c.showHtmlNotification(new ThemeResource("notification.html"));
+          } else {
+            layout.getApplication().getMainWindow()
+                .showNotification("You have mail.");
+          }
+        } catch (final InterruptedException e) {
+          // ignore
+        }
+      }
+    });
+    layout.addComponent(button);
+  }
 }
