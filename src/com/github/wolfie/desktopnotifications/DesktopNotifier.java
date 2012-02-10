@@ -23,6 +23,20 @@ import com.vaadin.ui.AbstractComponent;
 @com.vaadin.ui.ClientWidget(com.github.wolfie.desktopnotifications.widgetset.client.ui.VDesktopNotifier.class)
 public class DesktopNotifier extends AbstractComponent {
 
+  public interface SettingsListener {
+
+    /**
+     * @param isSupportedByBrowser
+     * @param isAllowed
+     *          <code>null</code> if the user hasn't given an answer yet
+     * @param isDisallowed
+     *          <code>null</code> if the user hasn't given an answer yet
+     */
+    void notificationSettingsChanged(Boolean isSupportedByBrowser,
+        Boolean isAllowed, Boolean isDisallowed);
+
+  }
+
   public class Notification {
     private final String icon;
     private final String heading;
@@ -61,6 +75,7 @@ public class DesktopNotifier extends AbstractComponent {
   private boolean pendingTextChange = false;
 
   private final Set<String> pendingHtmlNotifications = new HashSet<String>();
+  private final List<SettingsListener> listeners = new ArrayList<DesktopNotifier.SettingsListener>();
 
   @Override
   public void paintContent(final PaintTarget target) throws PaintException {
@@ -124,9 +139,12 @@ public class DesktopNotifier extends AbstractComponent {
       final Map<String, Object> variables) {
     super.changeVariables(source, variables);
 
+    boolean shouldCallListeners = false;
+
     if (variables.containsKey(VDesktopNotifier.VAR_BROWSER_SUPPORT_BOOL)) {
       isSupportedByBrowser = (Boolean) variables
           .get(VDesktopNotifier.VAR_BROWSER_SUPPORT_BOOL);
+      shouldCallListeners = true;
     }
 
     if (variables.containsKey(VDesktopNotifier.VAR_ALLOWED_BOOL)) {
@@ -134,6 +152,14 @@ public class DesktopNotifier extends AbstractComponent {
           .get(VDesktopNotifier.VAR_ALLOWED_BOOL);
       isAllowed = allowed;
       isDisallowed = !allowed;
+      shouldCallListeners = true;
+    }
+
+    if (shouldCallListeners) {
+      for (final SettingsListener listener : listeners) {
+        listener.notificationSettingsChanged(isSupportedByBrowser, isAllowed,
+            isDisallowed);
+      }
     }
   }
 
@@ -304,7 +330,15 @@ public class DesktopNotifier extends AbstractComponent {
       throw new PaintException("Ajax adapter does not "
           + "support resources of type: " + resource.getClass().getName());
     }
-
   }
 
+  public void addListener(final SettingsListener listener) {
+    if (listener != null) {
+      listeners.add(listener);
+    }
+  }
+
+  public void removeListener(final SettingsListener listener) {
+    listeners.remove(listener);
+  }
 }
