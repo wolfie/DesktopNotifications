@@ -1,27 +1,22 @@
 package com.github.wolfie.desktopnotifications;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import com.github.wolfie.desktopnotifications.widgetset.client.ui.VDesktopNotifier;
-import com.vaadin.Application;
-import com.vaadin.terminal.ApplicationResource;
-import com.vaadin.terminal.ExternalResource;
-import com.vaadin.terminal.PaintException;
-import com.vaadin.terminal.PaintTarget;
+import com.github.wolfie.desktopnotifications.widgetset.client.ui.DesktopNotifierClientRpc;
+import com.github.wolfie.desktopnotifications.widgetset.client.ui.DesktopNotifierServerRpc;
+import com.github.wolfie.desktopnotifications.widgetset.client.ui.DesktopNotifierState;
 import com.vaadin.terminal.Resource;
-import com.vaadin.terminal.ThemeResource;
 import com.vaadin.terminal.gwt.server.JsonPaintTarget;
+import com.vaadin.terminal.gwt.server.ResourceReference;
 import com.vaadin.ui.AbstractComponent;
 
 /**
  * Server side component for the VDesktopNotifier widget.
  */
-@com.vaadin.ui.ClientWidget(com.github.wolfie.desktopnotifications.widgetset.client.ui.VDesktopNotifier.class)
-public class DesktopNotifier extends AbstractComponent {
+public class DesktopNotifier extends AbstractComponent implements
+    DesktopNotifierServerRpc {
+  private static final long serialVersionUID = -4935586799603427503L;
 
   public interface SettingsListener {
 
@@ -67,29 +62,21 @@ public class DesktopNotifier extends AbstractComponent {
   private Boolean isAllowed;
   private Boolean isDisallowed;
 
+  /*-
   private final List<Notification> pendingNotifications = new ArrayList<Notification>();
   private final List<Resource> pendingHtmlNotificationsResources = new ArrayList<Resource>();
-  private boolean pendingPermissionRequest;
-
-  private String text = null;
-  private boolean pendingTextChange = false;
-
   private final Set<String> pendingHtmlNotifications = new HashSet<String>();
+   */
+
   private final List<SettingsListener> listeners = new ArrayList<DesktopNotifier.SettingsListener>();
 
+  public DesktopNotifier() {
+    registerRpc(this);
+  }
+
+  /*-
   @Override
   public void paintContent(final PaintTarget target) throws PaintException {
-    super.paintContent(target);
-
-    if (pendingPermissionRequest) {
-      target.addAttribute(VDesktopNotifier.ATT_REQUEST_PERMISSION, true);
-      pendingPermissionRequest = false;
-    }
-
-    if ((pendingTextChange || target.isFullRepaint()) && text != null) {
-      target.addAttribute(VDesktopNotifier.ATT_TEXT_STRING, text);
-      pendingTextChange = false;
-    }
 
     if (!pendingNotifications.isEmpty()) {
       final String[] icons = new String[pendingNotifications.size()];
@@ -137,35 +124,7 @@ public class DesktopNotifier extends AbstractComponent {
       pendingHtmlNotificationsResources.clear();
     }
   }
-
-  @Override
-  public void changeVariables(final Object source,
-      final Map<String, Object> variables) {
-    super.changeVariables(source, variables);
-
-    boolean shouldCallListeners = false;
-
-    if (variables.containsKey(VDesktopNotifier.VAR_BROWSER_SUPPORT_BOOL)) {
-      isSupportedByBrowser = (Boolean) variables
-          .get(VDesktopNotifier.VAR_BROWSER_SUPPORT_BOOL);
-      shouldCallListeners = true;
-    }
-
-    if (variables.containsKey(VDesktopNotifier.VAR_ALLOWED_BOOL)) {
-      final boolean allowed = (Boolean) variables
-          .get(VDesktopNotifier.VAR_ALLOWED_BOOL);
-      isAllowed = allowed;
-      isDisallowed = !allowed;
-      shouldCallListeners = true;
-    }
-
-    if (shouldCallListeners) {
-      for (final SettingsListener listener : listeners) {
-        listener.notificationSettingsChanged(isSupportedByBrowser, isAllowed,
-            isDisallowed);
-      }
-    }
-  }
+   */
 
   /**
    * Checks whether the browser supports desktop notifications as a feature.
@@ -244,8 +203,12 @@ public class DesktopNotifier extends AbstractComponent {
    */
   public void showNotification(final String iconUrl, final String header,
       final String body) {
+    getRpcProxy(DesktopNotifierClientRpc.class).showNotification(iconUrl,
+        header, body);
+    /*-
     pendingNotifications.add(new Notification(iconUrl, header, body));
     requestRepaint();
+     */
   }
 
   /**
@@ -265,6 +228,11 @@ public class DesktopNotifier extends AbstractComponent {
    */
   public void showNotification(final Resource iconResource,
       final String header, final String body) {
+
+    getRpcProxy(DesktopNotifierClientRpc.class).showNotification(
+        new ResourceReference(iconResource), header, body);
+
+    /*-
     try {
       final String iconResourceString = VDesktopNotifier.RESOURCE_STRING_PREFIX
           + convertResourceToString(iconResource);
@@ -274,6 +242,7 @@ public class DesktopNotifier extends AbstractComponent {
     } catch (final ResourceConversionException e) {
       throw new RuntimeException(e);
     }
+     */
   }
 
   /**
@@ -290,8 +259,11 @@ public class DesktopNotifier extends AbstractComponent {
    * @param url
    */
   public void showHtmlNotification(final String url) {
+    getRpcProxy(DesktopNotifierClientRpc.class).showNotification(url);
+    /*-
     pendingHtmlNotifications.add(url);
     requestRepaint();
+     */
   }
 
   /**
@@ -308,8 +280,12 @@ public class DesktopNotifier extends AbstractComponent {
    * @param resource
    */
   public void showHtmlNotification(final Resource resource) {
+    getRpcProxy(DesktopNotifierClientRpc.class).showNotification(
+        new ResourceReference(resource));
+    /*-
     pendingHtmlNotificationsResources.add(resource);
     requestRepaint();
+     */
   }
 
   /**
@@ -319,8 +295,12 @@ public class DesktopNotifier extends AbstractComponent {
    * @see #setFeatureDescriptionText(String)
    */
   public void requestPermission() {
-    pendingPermissionRequest = true;
-    requestRepaint();
+    getRpcProxy(DesktopNotifierClientRpc.class).requestPermission();
+  }
+
+  @Override
+  public DesktopNotifierState getState() {
+    return (DesktopNotifierState) super.getState();
   }
 
   /**
@@ -331,8 +311,7 @@ public class DesktopNotifier extends AbstractComponent {
    * @param text
    */
   public void setFeatureDescriptionText(final String text) {
-    this.text = text;
-    pendingTextChange = true;
+    getState().setText(text);
     requestRepaint();
   }
 
@@ -340,6 +319,7 @@ public class DesktopNotifier extends AbstractComponent {
    * Since there's no support for Resource arrays, we need to hack it. Copied
    * from {@link JsonPaintTarget#addAttribute(String, Resource)}
    */
+  /*-
   private static String convertResourceToString(final Resource resource)
       throws ResourceConversionException {
     if (resource instanceof ExternalResource) {
@@ -364,6 +344,7 @@ public class DesktopNotifier extends AbstractComponent {
           + "support resources of type: " + resource.getClass().getName());
     }
   }
+   */
 
   public void addListener(final SettingsListener listener) {
     if (listener != null) {
@@ -373,5 +354,18 @@ public class DesktopNotifier extends AbstractComponent {
 
   public void removeListener(final SettingsListener listener) {
     listeners.remove(listener);
+  }
+
+  @Override
+  public void notificationsAreAllowedSupported(final boolean allowed,
+      final boolean supported) {
+    isAllowed = allowed;
+    isDisallowed = !allowed;
+    isSupportedByBrowser = supported;
+
+    for (final SettingsListener listener : listeners) {
+      listener.notificationSettingsChanged(isSupportedByBrowser, isAllowed,
+          isDisallowed);
+    }
   }
 }

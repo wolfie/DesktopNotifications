@@ -13,8 +13,8 @@
 		<init-param>
 			<description>
 			Vaadin root class to use</description>
-			<param-name>application</param-name>
-			<param-value>com.github.wolfie.desktopnotifications.DesktopnotificationsApplication</param-value>
+			<param-name>root</param-name>
+			<param-value>com.github.wolfie.desktopnotifications.DesktopnotificationsRoot</param-value>
 		</init-param>
 		<init-param>
 			<param-name>widgetset</param-name>

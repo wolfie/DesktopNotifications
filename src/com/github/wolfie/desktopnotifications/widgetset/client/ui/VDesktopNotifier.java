@@ -12,12 +12,15 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
-import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
 import com.vaadin.terminal.gwt.client.VConsole;
 import com.vaadin.terminal.gwt.client.ui.VOverlay;
 
-public class VDesktopNotifier extends Widget implements Paintable {
+public class VDesktopNotifier extends Widget {
+
+  public interface SupportAndPermissionListener {
+    void notificationsAreAllowedSupported(boolean allowed, boolean supported);
+  }
 
   private static class VPermissionPopup extends VOverlay {
     public VPermissionPopup(final String text,
@@ -65,13 +68,9 @@ public class VDesktopNotifier extends Widget implements Paintable {
 
   public static final String CLASSNAME = "v-desktopnotifier";
 
-  public static final String VAR_ALLOWED_BOOL = "a";
-  public static final String VAR_BROWSER_SUPPORT_BOOL = "s";
   public static final String ATT_ICON_ARRAY_STR = "i";
   public static final String ATT_HEADING_ARRAY_STR = "h";
   public static final String ATT_BODY_ARRAY_STR = "b";
-  public static final String ATT_REQUEST_PERMISSION = "p";
-  public static final String ATT_TEXT_STRING = "t";
   public static final String ATT_HTML_NOTIFICATIONS_STRARR = "ph";
   public static final String ATT_HTML_NOTIFICATIONS_RESOURCE_STRARR = "phr";
 
@@ -93,6 +92,8 @@ public class VDesktopNotifier extends Widget implements Paintable {
 
   private boolean supportHasBeenChecked = false;
 
+  private SupportAndPermissionListener sapListener = null;
+
   private String text = "If you wish to enable this feature, you need to click \"Allow\" in the toolbar that appears after you close this window.";
 
   /**
@@ -106,6 +107,10 @@ public class VDesktopNotifier extends Widget implements Paintable {
     setHeight("0");
   }
 
+  public void setListener(final SupportAndPermissionListener listener) {
+    sapListener = listener;
+  }
+
   /**
    * Called whenever an update is received from the server
    */
@@ -116,14 +121,6 @@ public class VDesktopNotifier extends Widget implements Paintable {
 
     this.client = client;
     paintableId = uidl.getId();
-
-    if (uidl.hasAttribute(ATT_TEXT_STRING)) {
-      text = uidl.getStringAttribute(ATT_TEXT_STRING);
-    }
-
-    if (uidl.hasAttribute(ATT_REQUEST_PERMISSION)) {
-      trickUserIntoFiringAUserEvent(text);
-    }
 
     if (containsNotifications(uidl)) {
       if (!notificationsAreSupported()) {
@@ -188,13 +185,18 @@ public class VDesktopNotifier extends Widget implements Paintable {
   }
 
   private void checkForSupportAndSendResultsToServer() {
-    client.updateVariable(paintableId, VAR_BROWSER_SUPPORT_BOOL,
-        notificationsAreSupported(), false);
+    if (sapListener == null) {
+      VConsole.log("No " + SupportAndPermissionListener.class
+          + " is listening, can't tell anyone about support");
+      return;
+    }
 
     if (notificationsAreAllowed()) {
-      client.updateVariable(paintableId, VAR_ALLOWED_BOOL, true, false);
+      sapListener.notificationsAreAllowedSupported(true,
+          notificationsAreSupported());
     } else if (notificationsAreDisallowed()) {
-      client.updateVariable(paintableId, VAR_ALLOWED_BOOL, false, false);
+      sapListener.notificationsAreAllowedSupported(false,
+          notificationsAreSupported());
     } else {
       /*
        * since the notification allowing/disallowing isn't answered to yet,
@@ -202,7 +204,6 @@ public class VDesktopNotifier extends Widget implements Paintable {
        */
     }
 
-    client.sendPendingVariableChanges();
     supportHasBeenChecked = true;
   }
 
@@ -222,13 +223,13 @@ public class VDesktopNotifier extends Widget implements Paintable {
     return url;
   }
 
-  private static native boolean showNotification(String icon, String heading,
+  public static native boolean showNotification(String icon, String heading,
       String body)
   /*-{
    $wnd.webkitNotifications.createNotification(icon, heading, body).show();
   }-*/;
 
-  private static native boolean showHtmlNotification(String url)
+  public static native boolean showHtmlNotification(String url)
   /*-{
    $wnd.webkitNotifications.createHTMLNotification(url).show();
   }-*/;
@@ -282,5 +283,13 @@ public class VDesktopNotifier extends Widget implements Paintable {
       popup.center();
       popup.setPopupPosition(popup.getPopupLeft(), Window.getScrollTop() + 50);
     }
+  }
+
+  public void setText(final String text) {
+    this.text = text;
+  }
+
+  public void requestPermission() {
+    trickUserIntoFiringAUserEvent(text);
   }
 }
