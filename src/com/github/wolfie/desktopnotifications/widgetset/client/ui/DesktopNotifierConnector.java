@@ -53,6 +53,8 @@ public class DesktopNotifierConnector extends AbstractComponentConnector
     });
 
     serverRpc = RpcProxy.create(DesktopNotifierServerRpc.class, this);
+
+    getWidget().setListener(this);
   }
 
   @Override
