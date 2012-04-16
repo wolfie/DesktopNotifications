@@ -47,8 +47,7 @@ public class DesktopNotifierConnector extends AbstractComponentConnector
       @Override
       public void showNotification(final String iconUrl, final String header,
           final String body) {
-        // TODO Auto-generated method stub
-
+        VDesktopNotifier.showNotification(iconUrl, header, body);
       }
     });
 
