@@ -184,7 +184,7 @@ public class VDesktopNotifier extends Widget {
     }
   }
 
-  private void checkForSupportAndSendResultsToServer() {
+  public void checkForSupportAndSendResultsToServer() {
     if (sapListener == null) {
       VConsole.log("No " + SupportAndPermissionListener.class
           + " is listening, can't tell anyone about support");

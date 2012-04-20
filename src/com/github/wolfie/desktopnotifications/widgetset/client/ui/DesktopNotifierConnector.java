@@ -63,6 +63,12 @@ public class DesktopNotifierConnector extends AbstractComponentConnector
     serverRpc = RpcProxy.create(DesktopNotifierServerRpc.class, this);
 
     getWidget().setListener(this);
+
+    /*
+     * do this at init, so that we get immediate, if it's been denied or
+     * allowed.
+     */
+    getWidget().checkForSupportAndSendResultsToServer();
   }
 
   @Override
