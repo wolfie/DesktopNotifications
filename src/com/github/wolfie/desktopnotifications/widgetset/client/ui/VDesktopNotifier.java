@@ -111,69 +111,6 @@ public class VDesktopNotifier extends Widget {
     sapListener = listener;
   }
 
-  /**
-   * Called whenever an update is received from the server
-   */
-  public void updateFromUIDL(final UIDL uidl, final ApplicationConnection client) {
-    if (client.updateComponent(this, uidl, true)) {
-      return;
-    }
-
-    this.client = client;
-    paintableId = uidl.getId();
-
-    if (containsNotifications(uidl)) {
-      if (!notificationsAreSupported()) {
-        VConsole.log("Tried to send unsupported desktop notifications");
-      } else if (!notificationsAreAllowed()) {
-        VConsole.log("Notifications aren't allowed");
-      } else {
-        final String[] icons = uidl.getStringArrayAttribute(ATT_ICON_ARRAY_STR);
-        final String[] headings = uidl
-            .getStringArrayAttribute(ATT_HEADING_ARRAY_STR);
-        final String[] bodies = uidl
-            .getStringArrayAttribute(ATT_BODY_ARRAY_STR);
-
-        for (int i = 0; i < icons.length; i++) {
-          final String icon = convertResourceUrlToRealUrlIfNeeded(icons[i]);
-          showNotification(icon, headings[i], bodies[i]);
-        }
-      }
-    }
-
-    if (uidl.hasAttribute(ATT_HTML_NOTIFICATIONS_STRARR)) {
-      if (!notificationsAreSupported()) {
-        VConsole.log("Tried to send unsupported desktop notifications");
-      } else if (!notificationsAreAllowed()) {
-        VConsole.log("Notifications aren't allowed");
-      } else {
-        final String[] htmlUrls = uidl
-            .getStringArrayAttribute(ATT_HTML_NOTIFICATIONS_STRARR);
-        for (final String htmlUrl : htmlUrls) {
-          showHtmlNotification(htmlUrl);
-        }
-      }
-    }
-
-    if (uidl.hasAttribute(ATT_HTML_NOTIFICATIONS_RESOURCE_STRARR)) {
-      if (!notificationsAreSupported()) {
-        VConsole.log("Tried to send unsupported desktop notifications");
-      } else if (!notificationsAreAllowed()) {
-        VConsole.log("Notifications aren't allowed");
-      } else {
-        final String[] htmlResources = uidl
-            .getStringArrayAttribute(ATT_HTML_NOTIFICATIONS_RESOURCE_STRARR);
-        for (final String htmlUrl : htmlResources) {
-          showHtmlNotification(getSrc(htmlUrl, client));
-        }
-      }
-    }
-
-    if (!supportHasBeenChecked) {
-      checkForSupportAndSendResultsToServer();
-    }
-  }
-
   private String convertResourceUrlToRealUrlIfNeeded(final String url) {
     if (url.startsWith(RESOURCE_STRING_PREFIX)) {
       final String parsedResourceUrl = url.substring(RESOURCE_STRING_PREFIX

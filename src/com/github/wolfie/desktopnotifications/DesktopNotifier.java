@@ -7,7 +7,6 @@ import com.github.wolfie.desktopnotifications.widgetset.client.ui.DesktopNotifie
 import com.github.wolfie.desktopnotifications.widgetset.client.ui.DesktopNotifierServerRpc;
 import com.github.wolfie.desktopnotifications.widgetset.client.ui.DesktopNotifierState;
 import com.vaadin.terminal.Resource;
-import com.vaadin.terminal.gwt.server.JsonPaintTarget;
 import com.vaadin.terminal.gwt.server.ResourceReference;
 import com.vaadin.ui.AbstractComponent;
 
@@ -62,69 +61,11 @@ public class DesktopNotifier extends AbstractComponent implements
   private Boolean isAllowed;
   private Boolean isDisallowed;
 
-  /*-
-  private final List<Notification> pendingNotifications = new ArrayList<Notification>();
-  private final List<Resource> pendingHtmlNotificationsResources = new ArrayList<Resource>();
-  private final Set<String> pendingHtmlNotifications = new HashSet<String>();
-   */
-
   private final List<SettingsListener> listeners = new ArrayList<DesktopNotifier.SettingsListener>();
 
   public DesktopNotifier() {
     registerRpc(this);
   }
-
-  /*-
-  @Override
-  public void paintContent(final PaintTarget target) throws PaintException {
-
-    if (!pendingNotifications.isEmpty()) {
-      final String[] icons = new String[pendingNotifications.size()];
-      final String[] headings = new String[pendingNotifications.size()];
-      final String[] bodies = new String[pendingNotifications.size()];
-
-      for (int i = 0; i < pendingNotifications.size(); i++) {
-        final Notification n = pendingNotifications.get(i);
-        icons[i] = n.getIcon();
-        headings[i] = n.getHeading();
-        bodies[i] = n.getBody();
-      }
-      target.addAttribute(VDesktopNotifier.ATT_ICON_ARRAY_STR, icons);
-      target.addAttribute(VDesktopNotifier.ATT_HEADING_ARRAY_STR, headings);
-      target.addAttribute(VDesktopNotifier.ATT_BODY_ARRAY_STR, bodies);
-
-      pendingNotifications.clear();
-    }
-
-    if (!pendingHtmlNotifications.isEmpty()) {
-      final String[] htmlUrlsArray = pendingHtmlNotifications
-          .toArray(new String[pendingHtmlNotifications.size()]);
-      target.addAttribute(VDesktopNotifier.ATT_HTML_NOTIFICATIONS_STRARR,
-          htmlUrlsArray);
-      pendingHtmlNotifications.clear();
-    }
-
-    if (!pendingHtmlNotificationsResources.isEmpty()) {
-      final Resource[] htmlResourcesArray = pendingHtmlNotificationsResources
-          .toArray(new Resource[pendingHtmlNotificationsResources.size()]);
-
-      final String[] htmlResourceStringsArray = new String[htmlResourcesArray.length];
-      for (int i = 0; i < htmlResourcesArray.length; i++) {
-        try {
-          htmlResourceStringsArray[i] = convertResourceToString(htmlResourcesArray[i]);
-        } catch (final ResourceConversionException e) {
-          throw new PaintException(e.getMessage());
-        }
-      }
-
-      target.addAttribute(
-          VDesktopNotifier.ATT_HTML_NOTIFICATIONS_RESOURCE_STRARR,
-          htmlResourceStringsArray);
-
-      pendingHtmlNotificationsResources.clear();
-    }
-  }
-   */
 
   /**
    * Checks whether the browser supports desktop notifications as a feature.
@@ -205,10 +146,6 @@ public class DesktopNotifier extends AbstractComponent implements
       final String body) {
     getRpcProxy(DesktopNotifierClientRpc.class).showNotification4(iconUrl,
         header, body);
-    /*-
-    pendingNotifications.add(new Notification(iconUrl, header, body));
-    requestRepaint();
-     */
   }
 
   /**
@@ -228,21 +165,8 @@ public class DesktopNotifier extends AbstractComponent implements
    */
   public void showNotification(final Resource iconResource,
       final String header, final String body) {
-
     getRpcProxy(DesktopNotifierClientRpc.class).showNotification1(
         new ResourceReference(iconResource), header, body);
-
-    /*-
-    try {
-      final String iconResourceString = VDesktopNotifier.RESOURCE_STRING_PREFIX
-          + convertResourceToString(iconResource);
-      pendingNotifications.add(new Notification(iconResourceString, header,
-          body));
-      requestRepaint();
-    } catch (final ResourceConversionException e) {
-      throw new RuntimeException(e);
-    }
-     */
   }
 
   /**
@@ -260,10 +184,6 @@ public class DesktopNotifier extends AbstractComponent implements
    */
   public void showHtmlNotification(final String url) {
     getRpcProxy(DesktopNotifierClientRpc.class).showNotification2(url);
-    /*-
-    pendingHtmlNotifications.add(url);
-    requestRepaint();
-     */
   }
 
   /**
@@ -282,10 +202,6 @@ public class DesktopNotifier extends AbstractComponent implements
   public void showHtmlNotification(final Resource resource) {
     getRpcProxy(DesktopNotifierClientRpc.class).showNotification3(
         new ResourceReference(resource));
-    /*-
-    pendingHtmlNotificationsResources.add(resource);
-    requestRepaint();
-     */
   }
 
   /**
@@ -314,37 +230,6 @@ public class DesktopNotifier extends AbstractComponent implements
     getState().setText(text);
     requestRepaint();
   }
-
-  /**
-   * Since there's no support for Resource arrays, we need to hack it. Copied
-   * from {@link JsonPaintTarget#addAttribute(String, Resource)}
-   */
-  /*-
-  private static String convertResourceToString(final Resource resource)
-      throws ResourceConversionException {
-    if (resource instanceof ExternalResource) {
-      return ((ExternalResource) resource).getURL();
-
-    } else if (resource instanceof ApplicationResource) {
-      final ApplicationResource r = (ApplicationResource) resource;
-      final Application a = r.getApplication();
-      if (a == null) {
-        throw new ResourceConversionException(
-            "Application not specified for resorce "
-                + resource.getClass().getName());
-      }
-      final String uri = a.getRelativeLocation(r);
-      return uri;
-    } else if (resource instanceof ThemeResource) {
-      final String uri = "theme://"
-          + ((ThemeResource) resource).getResourceId();
-      return uri;
-    } else {
-      throw new ResourceConversionException("Ajax adapter does not "
-          + "support resources of type: " + resource.getClass().getName());
-    }
-  }
-   */
 
   public void addListener(final SettingsListener listener) {
     if (listener != null) {
