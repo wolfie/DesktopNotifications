@@ -4,3 +4,4 @@
 GWT development mode for DesktopNotifications.launch
 build/
 WebContent/VAADIN/widgetsets/
+gwt-unitCache

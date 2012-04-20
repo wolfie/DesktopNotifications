@@ -4,6 +4,7 @@ import com.github.wolfie.desktopnotifications.DesktopNotifier;
 import com.github.wolfie.desktopnotifications.widgetset.client.ui.VDesktopNotifier.SupportAndPermissionListener;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
+import com.vaadin.terminal.gwt.client.VConsole;
 import com.vaadin.terminal.gwt.client.communication.RpcProxy;
 import com.vaadin.terminal.gwt.client.communication.StateChangeEvent;
 import com.vaadin.terminal.gwt.client.communication.URLReference;
@@ -31,22 +32,30 @@ public class DesktopNotifierConnector extends AbstractComponentConnector
       @Override
       public void showNotification(final URLReference icon,
           final String header, final String body) {
+        VConsole
+            .error("DesktopNotifierConnector.init().new DesktopNotifierClientRpc() {...}.showNotification(URL STRING STRING)");
         VDesktopNotifier.showNotification(icon.getURL(), header, body);
       }
 
       @Override
       public void showNotification(final String url) {
+        VConsole
+            .error("DesktopNotifierConnector.init().new DesktopNotifierClientRpc() {...}.showNotification(String)");
         VDesktopNotifier.showHtmlNotification(url);
       }
 
       @Override
       public void showNotification(final URLReference resource) {
+        VConsole
+            .error("DesktopNotifierConnector.init().new DesktopNotifierClientRpc() {...}.showNotification(URL)");
         VDesktopNotifier.showHtmlNotification(resource.getURL());
       }
 
       @Override
       public void showNotification(final String iconUrl, final String header,
           final String body) {
+        VConsole
+            .error("DesktopNotifierConnector.init().new DesktopNotifierClientRpc() {...}.showNotification(STRING STRING STRING)");
         VDesktopNotifier.showNotification(iconUrl, header, body);
       }
     });
