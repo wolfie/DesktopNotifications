@@ -30,7 +30,7 @@ public class DesktopNotifierConnector extends AbstractComponentConnector
       }
 
       @Override
-      public void showNotification(final URLReference icon,
+      public void showNotification1(final URLReference icon,
           final String header, final String body) {
         VConsole
             .error("DesktopNotifierConnector.init().new DesktopNotifierClientRpc() {...}.showNotification(URL STRING STRING)");
@@ -38,21 +38,21 @@ public class DesktopNotifierConnector extends AbstractComponentConnector
       }
 
       @Override
-      public void showNotification(final String url) {
+      public void showNotification2(final String url) {
         VConsole
             .error("DesktopNotifierConnector.init().new DesktopNotifierClientRpc() {...}.showNotification(String)");
         VDesktopNotifier.showHtmlNotification(url);
       }
 
       @Override
-      public void showNotification(final URLReference resource) {
+      public void showNotification3(final URLReference resource) {
         VConsole
             .error("DesktopNotifierConnector.init().new DesktopNotifierClientRpc() {...}.showNotification(URL)");
         VDesktopNotifier.showHtmlNotification(resource.getURL());
       }
 
       @Override
-      public void showNotification(final String iconUrl, final String header,
+      public void showNotification4(final String iconUrl, final String header,
           final String body) {
         VConsole
             .error("DesktopNotifierConnector.init().new DesktopNotifierClientRpc() {...}.showNotification(STRING STRING STRING)");

@@ -203,7 +203,7 @@ public class DesktopNotifier extends AbstractComponent implements
    */
   public void showNotification(final String iconUrl, final String header,
       final String body) {
-    getRpcProxy(DesktopNotifierClientRpc.class).showNotification(iconUrl,
+    getRpcProxy(DesktopNotifierClientRpc.class).showNotification4(iconUrl,
         header, body);
     /*-
     pendingNotifications.add(new Notification(iconUrl, header, body));
@@ -229,7 +229,7 @@ public class DesktopNotifier extends AbstractComponent implements
   public void showNotification(final Resource iconResource,
       final String header, final String body) {
 
-    getRpcProxy(DesktopNotifierClientRpc.class).showNotification(
+    getRpcProxy(DesktopNotifierClientRpc.class).showNotification1(
         new ResourceReference(iconResource), header, body);
 
     /*-
@@ -259,7 +259,7 @@ public class DesktopNotifier extends AbstractComponent implements
    * @param url
    */
   public void showHtmlNotification(final String url) {
-    getRpcProxy(DesktopNotifierClientRpc.class).showNotification(url);
+    getRpcProxy(DesktopNotifierClientRpc.class).showNotification2(url);
     /*-
     pendingHtmlNotifications.add(url);
     requestRepaint();
@@ -280,7 +280,7 @@ public class DesktopNotifier extends AbstractComponent implements
    * @param resource
    */
   public void showHtmlNotification(final Resource resource) {
-    getRpcProxy(DesktopNotifierClientRpc.class).showNotification(
+    getRpcProxy(DesktopNotifierClientRpc.class).showNotification3(
         new ResourceReference(resource));
     /*-
     pendingHtmlNotificationsResources.add(resource);

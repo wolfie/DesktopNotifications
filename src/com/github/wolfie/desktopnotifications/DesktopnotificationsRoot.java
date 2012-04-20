@@ -18,7 +18,7 @@ public class DesktopnotificationsRoot extends Root {
 
   @Override
   protected void init(final WrappedRequest request) {
-    setDescription("Demo");
+    setCaption("Demo");
 
     final Label label = new Label(
         "How many seconds before you want to feel special?");

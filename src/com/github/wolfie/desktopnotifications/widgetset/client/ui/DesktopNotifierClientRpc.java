@@ -6,12 +6,17 @@ import com.vaadin.terminal.gwt.client.communication.URLReference;
 public interface DesktopNotifierClientRpc extends ClientRpc {
   void requestPermission();
 
-  void showNotification(URLReference resourceReference, String header,
+  /*
+   * The number suffixes for the method names are due to
+   * http://dev.vaadin.com/ticket/8456
+   */
+
+  void showNotification1(URLReference resourceReference, String header,
       String body);
 
-  void showNotification(String url);
+  void showNotification2(String url);
 
-  void showNotification(URLReference resourceReference);
+  void showNotification3(URLReference resourceReference);
 
-  void showNotification(String iconUrl, String header, String body);
+  void showNotification4(String iconUrl, String header, String body);
 }
