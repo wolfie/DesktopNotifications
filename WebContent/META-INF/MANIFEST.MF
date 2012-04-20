@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Implementation-Title: DesktopNotifications
-Implementation-Version: 1.0.0
+Implementation-Version: 1.0.0.7
 Vaadin-Package-Version: 1
-Class-Path: 
 Vaadin-Widgetsets: com.github.wolfie.desktopnotifications.widgetset.De
  sktopnotificationsWidgetset
+Class-Path: 
 
