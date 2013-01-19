@@ -6,13 +6,13 @@ import java.util.List;
 import com.github.wolfie.desktopnotifications.shared.DesktopNotifierClientRpc;
 import com.github.wolfie.desktopnotifications.shared.DesktopNotifierServerRpc;
 import com.github.wolfie.desktopnotifications.shared.DesktopNotifierState;
+import com.vaadin.server.AbstractExtension;
 import com.vaadin.server.Resource;
-import com.vaadin.ui.AbstractComponent;
 
 /**
  * Server side component for the VDesktopNotifier widget.
  */
-public class DesktopNotifier extends AbstractComponent implements
+public class DesktopNotifier extends AbstractExtension implements
 		DesktopNotifierServerRpc {
 	private static final long serialVersionUID = -4935586799603427503L;
 
@@ -103,7 +103,7 @@ public class DesktopNotifier extends AbstractComponent implements
 	}
 
 	private boolean browserHasSentSupportInformation() {
-		return isSupportedByBrowser != null || isSupportedByBrowser != null;
+		return isSupportedByBrowser != null;
 	}
 
 	/**

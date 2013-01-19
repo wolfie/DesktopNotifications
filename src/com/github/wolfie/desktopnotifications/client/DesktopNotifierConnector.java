@@ -1,23 +1,23 @@
 package com.github.wolfie.desktopnotifications.client;
 
 import com.github.wolfie.desktopnotifications.DesktopNotifier;
-import com.github.wolfie.desktopnotifications.client.DesktopNotifierWidget.SupportAndPermissionListener;
+import com.github.wolfie.desktopnotifications.client.DesktopNotifierExtension.SupportAndPermissionListener;
 import com.github.wolfie.desktopnotifications.shared.DesktopNotifierClientRpc;
 import com.github.wolfie.desktopnotifications.shared.DesktopNotifierServerRpc;
 import com.github.wolfie.desktopnotifications.shared.DesktopNotifierState;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.Widget;
+import com.vaadin.client.ServerConnector;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.communication.StateChangeEvent;
-import com.vaadin.client.ui.AbstractComponentConnector;
+import com.vaadin.client.extensions.AbstractExtensionConnector;
 import com.vaadin.shared.ui.Connect;
 
 @Connect(DesktopNotifier.class)
-public class DesktopNotifierConnector extends AbstractComponentConnector
+public class DesktopNotifierConnector extends AbstractExtensionConnector
 		implements SupportAndPermissionListener {
 
 	private static final long serialVersionUID = 3927755257353627672L;
 	private DesktopNotifierServerRpc serverRpc;
+	private final DesktopNotifierExtension notifier = new DesktopNotifierExtension();
 
 	@Override
 	protected void init() {
@@ -28,44 +28,38 @@ public class DesktopNotifierConnector extends AbstractComponentConnector
 
 					@Override
 					public void requestPermission() {
-						getWidget().requestPermission();
+						getExtension().requestPermission();
 					}
 
 					@Override
 					public void showNotification1(final String header,
 							final String body) {
 						final String iconUrl = getResourceUrl(DesktopNotifierState.ICON);
-						DesktopNotifierWidget.showNotification(iconUrl, header,
+						DesktopNotifierExtension.showNotification(iconUrl, header,
 								body);
 					}
 
 					@Override
 					public void showNotification4(final String iconUrl,
 							final String header, final String body) {
-						DesktopNotifierWidget.showNotification(iconUrl, header,
+						DesktopNotifierExtension.showNotification(iconUrl, header,
 								body);
 					}
 				});
 
 		serverRpc = RpcProxy.create(DesktopNotifierServerRpc.class, this);
 
-		getWidget().setListener(this);
+		getExtension().setListener(this);
 
 		/*
 		 * do this at init, so that we get immediate, if it's been denied or
 		 * allowed.
 		 */
-		getWidget().checkForSupportAndSendResultsToServer();
+		getExtension().checkForSupportAndSendResultsToServer();
 	}
 
-	@Override
-	protected Widget createWidget() {
-		return GWT.create(DesktopNotifierWidget.class);
-	}
-
-	@Override
-	public DesktopNotifierWidget getWidget() {
-		return (DesktopNotifierWidget) super.getWidget();
+	public DesktopNotifierExtension getExtension() {
+		return notifier;
 	}
 
 	@Override
@@ -77,7 +71,7 @@ public class DesktopNotifierConnector extends AbstractComponentConnector
 	public void onStateChanged(final StateChangeEvent stateChangeEvent) {
 		super.onStateChanged(stateChangeEvent);
 
-		getWidget().setText(getState().text);
+		getExtension().setText(getState().text);
 	}
 
 	@Override
@@ -89,5 +83,10 @@ public class DesktopNotifierConnector extends AbstractComponentConnector
 	@Override
 	public void notificationsAreSupported(final boolean supported) {
 		serverRpc.notificationsAreSupported(supported);
+	}
+
+	@Override
+	protected void extend(final ServerConnector target) {
+		// nothing to do.
 	}
 }

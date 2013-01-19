@@ -40,7 +40,7 @@ public class DesktopnotificationsUI extends UI {
 		addButton(8, cssLayout);
 		addButton(10, cssLayout);
 
-		root.addComponent(c);
+		addExtension(c);
 
 		final Button awesomeButton = new Button("Make notifications awesome",
 				new Button.ClickListener() {

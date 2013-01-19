@@ -1,6 +1,5 @@
 package com.github.wolfie.desktopnotifications.client;
 
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
@@ -16,7 +15,7 @@ import com.vaadin.client.UIDL;
 import com.vaadin.client.VConsole;
 import com.vaadin.client.ui.VOverlay;
 
-public class DesktopNotifierWidget extends Widget {
+public class DesktopNotifierExtension extends Widget {
 
 	public interface SupportAndPermissionListener {
 		void notificationsAreAllowedAndSupported(boolean allowed,
@@ -60,7 +59,7 @@ public class DesktopNotifierWidget extends Widget {
 				AsyncCallback<Void> callback)
 		/*-{
 		  $wnd.webkitNotifications.requestPermission($entry(function() {
-		          x.@com.github.wolfie.desktopnotifications.client.DesktopNotifierWidget.PermissionPopup::callbackRequestPermission(Lcom/google/gwt/user/client/rpc/AsyncCallback;)(callback);
+		          x.@com.github.wolfie.desktopnotifications.client.DesktopNotifierExtension.PermissionPopup::callbackRequestPermission(Lcom/google/gwt/user/client/rpc/AsyncCallback;)(callback);
 		  }));
 		}-*/;
 
@@ -93,38 +92,14 @@ public class DesktopNotifierWidget extends Widget {
 	 */
 	public static final String RESOURCE_STRING_PREFIX = "!";
 
-	protected String paintableId;
-	ApplicationConnection client;
-
 	private boolean supportHasBeenChecked = false;
 
 	private SupportAndPermissionListener sapListener = null;
 
 	private String text = "If you wish to enable this feature, you need to click \"Allow\" in the toolbar that appears after you close this window.";
 
-	/**
-	 * The constructor should first call super() to initialize the component and
-	 * then handle any initialization relevant to Vaadin.
-	 */
-	public DesktopNotifierWidget() {
-		setElement(Document.get().createDivElement());
-		setStyleName(CLASSNAME);
-		setWidth("0");
-		setHeight("0");
-	}
-
 	public void setListener(final SupportAndPermissionListener listener) {
 		sapListener = listener;
-	}
-
-	private String convertResourceUrlToRealUrlIfNeeded(final String url) {
-		if (url.startsWith(RESOURCE_STRING_PREFIX)) {
-			final String parsedResourceUrl = url
-					.substring(RESOURCE_STRING_PREFIX.length());
-			return getSrc(parsedResourceUrl, client);
-		} else {
-			return url;
-		}
 	}
 
 	public void checkForSupportAndSendResultsToServer() {
