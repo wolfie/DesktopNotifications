@@ -1,7 +1,10 @@
-package com.github.wolfie.desktopnotifications.widgetset.client.ui;
+package com.github.wolfie.desktopnotifications.client;
 
 import com.github.wolfie.desktopnotifications.DesktopNotifier;
-import com.github.wolfie.desktopnotifications.widgetset.client.ui.DesktopNotifierWidget.SupportAndPermissionListener;
+import com.github.wolfie.desktopnotifications.client.DesktopNotifierWidget.SupportAndPermissionListener;
+import com.github.wolfie.desktopnotifications.shared.DesktopNotifierClientRpc;
+import com.github.wolfie.desktopnotifications.shared.DesktopNotifierServerRpc;
+import com.github.wolfie.desktopnotifications.shared.DesktopNotifierState;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.client.communication.RpcProxy;

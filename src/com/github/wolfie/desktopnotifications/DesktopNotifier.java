@@ -3,9 +3,9 @@ package com.github.wolfie.desktopnotifications;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.wolfie.desktopnotifications.widgetset.client.ui.DesktopNotifierClientRpc;
-import com.github.wolfie.desktopnotifications.widgetset.client.ui.DesktopNotifierServerRpc;
-import com.github.wolfie.desktopnotifications.widgetset.client.ui.DesktopNotifierState;
+import com.github.wolfie.desktopnotifications.shared.DesktopNotifierClientRpc;
+import com.github.wolfie.desktopnotifications.shared.DesktopNotifierServerRpc;
+import com.github.wolfie.desktopnotifications.shared.DesktopNotifierState;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.AbstractComponent;
 

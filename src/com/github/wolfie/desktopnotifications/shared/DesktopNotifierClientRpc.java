@@ -1,4 +1,4 @@
-package com.github.wolfie.desktopnotifications.widgetset.client.ui;
+package com.github.wolfie.desktopnotifications.shared;
 
 import com.vaadin.shared.communication.ClientRpc;
 

@@ -1,0 +1,16 @@
+.v-permissionpopup {
+	padding: 10px;
+	border-radius: 5px;
+	background-color: rgb(240,240,165);
+	background-color: rgba(255,255,0,0.2); /* for css3 support */
+	border: 2px solid rgb(200,200,0);
+	border-color: rgba(127,127,0,0.2); /* for css3 support */
+	font-family: Arial, Helvetica, Tahoma, Verdana, sans-serif;
+	color: #440;
+}
+
+.v-permissionpopup .okbutton {
+	margin-top: 1em;
+	padding: 0.5em 1em;
+	font-weight: bold;
+}

@@ -18,7 +18,7 @@
 		</init-param>
 		<init-param>
 			<param-name>widgetset</param-name>
-			<param-value>com.github.wolfie.desktopnotifications.widgetset.DesktopnotificationsWidgetset</param-value>
+			<param-value>com.github.wolfie.desktopnotifications.DesktopnotificationsWidgetset</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>

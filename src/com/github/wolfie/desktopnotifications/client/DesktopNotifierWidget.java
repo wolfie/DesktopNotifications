@@ -1,4 +1,4 @@
-package com.github.wolfie.desktopnotifications.widgetset.client.ui;
+package com.github.wolfie.desktopnotifications.client;
 
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -60,7 +60,7 @@ public class DesktopNotifierWidget extends Widget {
 				AsyncCallback<Void> callback)
 		/*-{
 		  $wnd.webkitNotifications.requestPermission($entry(function() {
-		          x.@com.github.wolfie.desktopnotifications.widgetset.client.ui.DesktopNotifierWidget.PermissionPopup::callbackRequestPermission(Lcom/google/gwt/user/client/rpc/AsyncCallback;)(callback);
+		          x.@com.github.wolfie.desktopnotifications.client.DesktopNotifierWidget.PermissionPopup::callbackRequestPermission(Lcom/google/gwt/user/client/rpc/AsyncCallback;)(callback);
 		  }));
 		}-*/;
 
